@@ -16,9 +16,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     ArrayList<LinearLayout> rows;
     Obutton [][] board;
 
+    public  static final int Player_B=0;
+    public  static final int Player_W=1;
+
     public static final int INCOMPLETE = 0;
-    public static final int WON = 1;
-    public  static final int LOST=-1;
+    public static final int Player_B_Won = 1;
+    public  static final int Player_W_Won = 2;
+    public static final int DRAW = 4;
+
+    public int Currentstatus;
+    public int currentplayer;
+
+    int[] one = {-1, -1, -1, 0, 0, 1, 1, 1};
+    int[] two = {-1, 0, 1, -1, 1, -1, 0, 1};
 
 
     @Override
@@ -40,12 +50,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         rootlayout.removeAllViews();
 
+
         for(int i=0;i<size;i++)
         {
             LinearLayout linearLayout=new LinearLayout(this);
             LinearLayout.LayoutParams param=new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,0,1);
             linearLayout.setLayoutParams(param);
 
+            //linearLayout.setBackgroundColor(this.getResources().getColor(R.color.green));
             rootlayout.addView(linearLayout);
             rows.add(linearLayout);
 
@@ -66,6 +78,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 layoutParams.bottomMargin = -12;
                 b.setLayoutParams(layoutParams);
                 b.setOnClickListener(this);
+                b.setBackground(this.getResources().getDrawable(R.drawable.button_bg));
+                b.setEnabled(false);
+                b.row=i;
+                b.col=j;
 
                 LinearLayout row = rows.get(i);
 
@@ -77,13 +93,270 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
 
+        int[] startrow={3,3,4,4};
+        int[] startcol={3,4,3,4};
+
+
+        for(int i=0;i<4;i++) {
+
+            if(i== 0  || i==3) {
+
+                Obutton b = board[startrow[i]][startcol[i]];
+                b.setBackground(this.getResources().getDrawable(R.drawable.white));
+                b.reveal=true;
+                b.player=1;
+
+            }
+
+            if(i== 1 || i==2) {
+
+                Obutton b = board[startrow[i]][startcol[i]];
+                b.setBackground(this.getResources().getDrawable(R.drawable.black));
+                b.reveal=true;
+                b.player=0;
+            }
+
+
+        }
+        setValidMoveW(3,4);
+        setValidMoveW(4,3);
+
+    }
+
+    public void setValidMoveB(int r, int c)
+    {
+        for(int i=0;i<8;i++)
+        {
+            int row=r+one[i];
+            int col=c+two[i];
+            if(row>=0 && row<size && col>=0 && col <size) {
+                Obutton b = board[row][col];
+
+                if (b.reveal == false && b.isvalid == false) {
+
+                    if(neighboursB(b.row, b.col)) {
+                        b.isvalid = true;
+                        b.setEnabled(true);
+                        b.setBackgroundColor(this.getResources().getColor(R.color.lightgreen));
+
+
+                    }
+                }
+
+            }
+
+        }
+
+        return;
+
+    }
+
+    public void setValidMoveW(int r, int c)
+    {
+        for(int i=0;i<8;i++)
+        {
+            int row=r+one[i];
+            int col=c+two[i];
+            if(row>=0 && row<size && col>=0 && col <size) {
+                Obutton b = board[row][col];
+
+                if (b.reveal == false && b.isvalid == false) {
+
+                    if(neighboursW(b.row, b.col)) {
+                        b.isvalid = true;
+                        b.setEnabled(true);
+                        b.setBackgroundColor(this.getResources().getColor(R.color.lightgreen));
+
+
+                    }
+                }
+
+            }
+
+        }
+
+        return;
+
+    }
+
+    public boolean neighboursB(int r,int c)
+    {
+        boolean valid = false;
+        for(int i=0;i<8;i++)
+        {
+            boolean dir=false;
+            int a=r+one[i];
+            int b=c+two[i];
+
+          if(a>=0 && a<size && b>=0 && b <size && board[a][b].player == 1) {
+              //Obutton bt = board[a][b];
+
+                  int neighrow = a + one[i];
+                  int neighcol = b + two[i];
+                  while (neighrow >= 0 && neighrow < size && neighcol >= 0 && neighcol < size) {
+                      Obutton butn = board[neighrow][neighcol];
+                      if (butn.player == 0) {
+
+                          dir = true;
+                          break;
+                      }
+
+                      if (butn.player == -1)
+                          break;
+
+                      neighrow = neighrow + one[i];
+                      neighcol = neighcol + two[i];
+
+                  }
+
+              }
+
+
+
+          if(dir == true) {
+              board[r][c].dirc[i] = 1;
+              valid = true;
+
+          }
+
+
+        }
+
+        if(valid == true)
+            return true;
+        else
+            return false;
+
+
+
+    }
+
+
+    public boolean neighboursW(int r,int c)
+    {
+        boolean valid = false;
+        for(int i=0;i<8;i++)
+        {
+            boolean dir=false;
+            int a=r+one[i];
+            int b=c+two[i];
+
+            if(a>=0 && a<size && b>=0 && b <size && board[a][b].player == 0) {
+                //Obutton bt = board[a][b];
+
+                int neighrow = a + one[i];
+                int neighcol = b + two[i];
+                while (neighrow >= 0 && neighrow < size && neighcol >= 0 && neighcol < size) {
+                    Obutton butn = board[neighrow][neighcol];
+                    if (butn.player == 1) {
+
+                        dir = true;
+                        break;
+                    }
+
+                    if (butn.player == -1)
+                        break;
+
+                    neighrow = neighrow + one[i];
+                    neighcol = neighcol + two[i];
+
+                }
+
+            }
+
+
+
+            if(dir == true) {
+                board[r][c].dirc[i] = 1;
+                valid = true;
+
+            }
+
+
+        }
+
+        if(valid == true)
+            return true;
+        else
+            return false;
+
+
+
+    }
+
+    public void setValidMove()
+    {
+        if(currentplayer == Player_B)
+        {
+            for (int i = 0; i < size; i++) {
+                for (int j = 0; j < size; j++) {
+                    Obutton b = board[i][j];
+
+                    if(b.player == 1)
+                        setValidMoveB(b.row, b.col);
+
+                }
+            }
+        }
+
+        else
+        {
+            for (int i = 0; i < size; i++) {
+                for (int j = 0; j < size; j++) {
+                    Obutton b = board[i][j];
+
+                    if(b.player == 0)
+                        setValidMoveW(b.row, b.col);
+
+
+                }
+            }
+        }
+
+
     }
 
 
     @Override
     public void onClick(View view) {
 
+        /*
+        if(currentstatus == INCOMPLETE)
+        {
+            Obutton b = (Obutton) view;
+            if(b.isvalid)
+            {
+                changeBall();
+                checkGameStatus();
+                togglePlayer();
+                setValidMove();
+            }
+        }*/
 
 
     }
+
+    public void changeBall()
+    {
+
+
+    }
+
+    public  void checkGameStatus()
+    {
+
+
+
+    }
+
+    public void togglePlayer()
+    {
+        if(currentplayer == Player_B)
+            currentplayer=Player_W;
+        else
+            currentplayer=Player_B;
+
+    }
+
+
 }
