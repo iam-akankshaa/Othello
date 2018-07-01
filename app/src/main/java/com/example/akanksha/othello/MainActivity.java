@@ -45,11 +45,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void setupBoard()
     {
+        currentstatus=INCOMPLETE;
+        currentplayer=Player_B;
         rows=new ArrayList<>();
         board=new Obutton[size][size];
 
         rootlayout.removeAllViews();
-
 
         for(int i=0;i<size;i++)
         {
@@ -104,7 +105,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Obutton b = board[startrow[i]][startcol[i]];
                 b.setBackground(this.getResources().getDrawable(R.drawable.white));
                 b.reveal=true;
-                b.player=1;
+                b.setPlayer(Player_W);
+                b.setEnabled(false);
 
             }
 
@@ -113,13 +115,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Obutton b = board[startrow[i]][startcol[i]];
                 b.setBackground(this.getResources().getDrawable(R.drawable.black));
                 b.reveal=true;
-                b.player=0;
+                b.setPlayer(Player_B);
+                b.setEnabled(false);
             }
 
 
         }
-        setValidMoveW(3,4);
-        setValidMoveW(4,3);
+        setValidMoveB(3,3);
+        setValidMoveB(4,4);
 
     }
 
@@ -320,30 +323,134 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View view) {
 
-        /*
+
         if(currentstatus == INCOMPLETE)
         {
             Obutton b = (Obutton) view;
             if(b.isvalid)
             {
-                changeBall();
-                checkGameStatus();
+                if(currentplayer == Player_B) {
+                    b.isvalid=false;
+                    b.setPlayer(Player_B);
+                    b.reveal = true;
+                    b.setEnabled(false);
+                    b.setBackground(this.getResources().getDrawable(R.drawable.black));
+                    changeBallB(b.row, b.col);
+                }
+                else{
+                    b.isvalid=false;
+                    b.setPlayer(Player_W);
+                    b.reveal=true;
+                    b.setEnabled(false);
+                    b.setBackground(this.getResources().getDrawable(R.drawable.white));
+                    changeBallW(b.row,b.col);
+                }
+
+                //checkGameStatus();
                 togglePlayer();
                 setValidMove();
             }
-        }*/
+        }
 
 
     }
 
-    public void changeBall()
+    public void changeBallB(int r, int c)
     {
+        Obutton b =board[r][c];
+
+        for(int i=0;i<8;i++)
+       {
+           if(b.dirc[i] == 1)
+           {
+               int neighrow = r + one[i];
+               int neighcol = c + two[i];
+               while (neighrow >= 0 && neighrow < size && neighcol >= 0 && neighcol < size) {
+                   Obutton butn = board[neighrow][neighcol];
+                   if (butn.player == 0 || butn.player == -1) {
+
+                       break;
+                   }
+
+                   if (butn.player == 1)
+                   {
+                       butn.setPlayer(Player_B);
+                       butn.reveal=true;
+                       butn.setEnabled(false);
+                       butn.setBackground(this.getResources().getDrawable(R.drawable.black));
+
+
+                   }
+
+
+                   neighrow = neighrow + one[i];
+                   neighcol = neighcol + two[i];
+
+               }
+
+           }
+       }
+
 
 
     }
+
+
+    public void changeBallW(int r, int c)
+    {
+        Obutton b =board[r][c];
+
+        for(int i=0;i<8;i++)
+        {
+            if(b.dirc[i] == 1)
+            {
+                int neighrow = r + one[i];
+                int neighcol = c + two[i];
+                while (neighrow >= 0 && neighrow < size && neighcol >= 0 && neighcol < size) {
+                    Obutton butn = board[neighrow][neighcol];
+                    if (butn.player == 1 || butn.player == -1) {
+
+                        break;
+                    }
+
+                    if (butn.player == 0)
+                    {
+                        butn.setPlayer(Player_W);
+                        butn.reveal=true;
+                        butn.setEnabled(false);
+                        butn.setBackground(this.getResources().getDrawable(R.drawable.white));
+
+
+                    }
+
+
+                    neighrow = neighrow + one[i];
+                    neighcol = neighcol + two[i];
+
+                }
+
+            }
+        }
+
+
+
+    }
+
 
     public  void checkGameStatus()
     {
+        int blackPoint=0;
+        int whitePoint=0;
+
+        for(int i=0;i<size;i++)
+        {
+            for(int j=0;j<size;j++)
+            {
+                Obutton b=board[i][j];
+
+
+            }
+        }
 
 
 
@@ -351,6 +458,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void togglePlayer()
     {
+        //Disabling of earlier setted Valid Moves
+        for(int i=0;i<size;i++)
+        {
+            for(int j=0;j<size;j++)
+            {
+                Obutton b=board[i][j];
+                if(b.isvalid)
+                {
+                    b.isvalid=false;
+                    b.setEnabled(false);
+                    b.setBackground(this.getResources().getDrawable(R.drawable.button_bg));
+
+                }
+            }
+        }
+
         if(currentplayer == Player_B)
             currentplayer=Player_W;
         else
